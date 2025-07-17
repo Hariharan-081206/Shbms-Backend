@@ -7,12 +7,10 @@ import session from 'express-session';
 import passport from 'passport';
 
 import patientRoutes from './routers/patientdetailsrouter.js';
-import authRoutes from './routers/authrouter.js'; // 👈 Add this
-import configurePassport from './config/passport.js'; // 👈 Add this
+import authRoutes from './routers/authrouter.js'; 
+import configurePassport from './config/passport.js'; 
 
-// Models
-import User from './models/user.js'; // required by passport
-// import Host from './models/Host.js'; // if you're using it
+import User from './models/user.js'; 
 
 const app = express();
 const server = http.createServer(app);
@@ -34,8 +32,8 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // set true in production with HTTPS
-    maxAge: 24 * 60 * 60 * 1000 // 1 day
+    secure: false, 
+    maxAge: 24 * 60 * 60 * 1000 
   }
 }));
 
@@ -45,8 +43,8 @@ app.use(passport.session());
 configurePassport(app); // must come after app.locals.models
 
 // Routes
-app.use('/api/patients', patientRoutes);       // your patient routes
-app.use('/auth', authRoutes);                  // 👈 Google OAuth routes
+app.use('/api/patients', patientRoutes);       
+app.use('/auth', authRoutes);                 
 
 // Health check
 app.get('/', (req, res) => {
