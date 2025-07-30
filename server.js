@@ -5,7 +5,7 @@ import cors from 'cors';
 import http from 'http';
 import session from 'express-session';
 import passport from 'passport';
-
+import bedDashboardRouter from './routers/bedrouter.js';
 import patientRoutes from './routers/patientdetailsrouter.js';
 import authRoutes from './routers/authrouter.js'; 
 import configurePassport from './config/passport.js'; 
@@ -20,7 +20,7 @@ app.locals.models = { User }; // or { User, Host } if Host is used
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'http://localhost:8080',
   credentials: true
 }));
 app.use(express.json());
@@ -43,7 +43,8 @@ app.use(passport.session());
 configurePassport(app); // must come after app.locals.models
 
 // Routes
-app.use('/api/patients', patientRoutes);       
+app.use('/api/patients', patientRoutes); 
+app.use('/api/beds',bedDashboardRouter);      
 app.use('/auth', authRoutes);                 
 
 // Health check

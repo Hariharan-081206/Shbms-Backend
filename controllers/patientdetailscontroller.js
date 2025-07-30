@@ -24,19 +24,20 @@ export const createPatient = async (req, res) => {
       { new: true, upsert: true }
     );
 
-    const paddedNumber = counter.count.toString().padStart(4, '0'); // e.g., 0001
-    const admissionNumber = `${upperWard}${currentYear}${paddedNumber}`; // e.g., ICU20250001
+    const paddedNumber = counter.count.toString().padStart(4, '0');
+    const admissionNumber = `${upperWard}${currentYear}${paddedNumber}`;
 
-    // 🏥 Step 3: Create patient with auto-generated admissionNumber and default status
+    // ✅ Step 3: Create patient with admissionNumber and bed reference
     const patient = new Patient({
       ...req.body,
       admissionNumber,
-      status: 'admitted' // ✅ Ensure patient is admitted
+      status: 'admitted',
+      bed: freeBed._id // ✅ Link the bed to the patient
     });
 
     const savedPatient = await patient.save();
 
-    // 🛏️ Step 4: Mark the bed as occupied and assign patient ID
+    // 🛏️ Step 4: Update the bed to mark it occupied and assign patient ID
     freeBed.isOccupied = true;
     freeBed.assignedTo = savedPatient._id;
     await freeBed.save();
@@ -52,6 +53,7 @@ export const createPatient = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
 
 export const getAllPatients = async (req, res) => {
   try {

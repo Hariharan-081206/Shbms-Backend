@@ -24,7 +24,12 @@ const patientSchema = new mongoose.Schema({
   },
 
   reasonForAdmitting: { type: String },
-  consultingDoctor: { type: String }
+  consultingDoctor: { type: String },
+  bed: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Bed',
+    default: null
+  }
 }, { timestamps: true });
 
 const Patient = mongoose.model('Patient', patientSchema);
