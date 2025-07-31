@@ -1,5 +1,9 @@
 import mongoose from 'mongoose';
-
+const validWards = [
+  'General', 'ICU', 'Emergency', 'Pediatric', 'Maternity',
+  'Surgical', 'Cardiac', 'Neurology', 'Orthopedics',
+  'Pulmonology', 'Oncology', 'Burn/Plastic Surgery', 'Nephrology'
+];
 const patientSchema = new mongoose.Schema({
   admissionNumber: {
       type: String,
@@ -11,10 +15,12 @@ const patientSchema = new mongoose.Schema({
   dob: { type: Date, required: true },
   bloodGroup: { type: String, required: true },
   gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
-  guardian: { type: String },
+  //guardian: { type: String },
+  primarymedicalcondititon: { type: String },
+  Department:{ type: String, required: true, enum: validWards },
+  admissiontype: { type: String, enum: ['Planned', 'Transfer', 'Emergency','Outpatient'], required: true },
   contactNumber: { type: String, required: true },
   address: { type: String },
-  ward: { type: String, required: true },
   admissionDate: { type: Date, required: true },
   status: {
     type: String,

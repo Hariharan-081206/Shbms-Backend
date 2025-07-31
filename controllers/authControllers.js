@@ -9,7 +9,7 @@ export const googleAuth = passport.authenticate('google', {
 // Handle callback from Google
 export const googleAuthCallback = passport.authenticate('google', {
   failureRedirect: '/auth/failure',
-  successRedirect: process.env.FRONTEND_URL || 'http://localhost:5173'
+  successRedirect: process.env.FRONTEND_URL || 'http://localhost:8080'
 });
 
 // Logout
