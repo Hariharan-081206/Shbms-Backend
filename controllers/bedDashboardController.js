@@ -1,10 +1,17 @@
-import Bed from '../models/bedmodel.js'
+import Bed from '../models/bedmodel.js';
+
 
 export const createBed = async (req, res) => {
   try {
-    const { ward, bedNumber } = req.body;
+    const {
+      ward,
+      bedNumber,
+      oxygenSupport = false,
+      monitoringEquipment = false,
+      status = 'available'
+    } = req.body;
 
-    if (!ward || !bedNumber) {
+    if (!ward || bedNumber === undefined) {
       return res.status(400).json({ error: 'ward and bedNumber are required' });
     }
 
@@ -13,14 +20,25 @@ export const createBed = async (req, res) => {
       return res.status(400).json({ error: 'Bed already exists in this ward' });
     }
 
-    const newBed = new Bed({ ward, bedNumber });
+    const newBed = new Bed({
+      ward,
+      bedNumber,
+      oxygenSupport,
+      monitoringEquipment,
+      status
+    });
+
     await newBed.save();
 
-    res.status(201).json({ message: 'Bed created successfully', bed: newBed });
+    return res.status(201).json({
+      message: 'Bed created successfully',
+      bed: newBed
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    return res.status(500).json({ error: error.message });
   }
 };
+
 
 export const getBedSummary = async (req, res) => {
   try {
@@ -33,6 +51,11 @@ export const getBedSummary = async (req, res) => {
             $sum: {
               $cond: [{ $eq: ['$isOccupied', false] }, 1, 0]
             }
+          },
+          occupiedBeds: {
+            $sum: {
+              $cond: [{ $eq: ['$isOccupied', true] }, 1, 0]
+            }
           }
         }
       },
@@ -41,16 +64,15 @@ export const getBedSummary = async (req, res) => {
           _id: 0,
           ward: '$_id',
           totalBeds: 1,
-          availableBeds: 1
+          availableBeds: 1,
+          occupiedBeds: 1
         }
       },
-      {
-        $sort: { ward: 1 }
-      }
+      { $sort: { ward: 1 } }
     ]);
 
-    res.json(summary);
+    return res.status(200).json(summary);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };

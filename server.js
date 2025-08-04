@@ -7,6 +7,7 @@ import session from 'express-session';
 import passport from 'passport';
 import bedDashboardRouter from './routers/bedrouter.js';
 import patientRoutes from './routers/patientdetailsrouter.js';
+import BloodBankroutes from './routers/bloodbank.js';
 import authRoutes from './routers/authrouter.js'; 
 import configurePassport from './config/passport.js'; 
 
@@ -44,7 +45,8 @@ configurePassport(app); // must come after app.locals.models
 
 // Routes
 app.use('/api/patients', patientRoutes); 
-app.use('/api/beds',bedDashboardRouter);      
+app.use('/api/beds',bedDashboardRouter);  
+app.use('/api/bloodbank',BloodBankroutes);    
 app.use('/auth', authRoutes);                 
 
 // Health check

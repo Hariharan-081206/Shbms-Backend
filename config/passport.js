@@ -1,9 +1,8 @@
-// config/passport.js
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import allowedUsers from './allowedUsers.js'; // Static email-to-role mapping
+import allowedUsers from './allowedUsers.js';
 
-export default function configurePassport(app) {
+const configurePassport = (app) => {
   if (!app.locals?.models) {
     throw new Error('❌ Models not initialized! Make sure to set app.locals.models before calling configurePassport.');
   }
@@ -13,28 +12,31 @@ export default function configurePassport(app) {
   passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: process.env.CALLBACK_URL,
+    callbackURL: process.env.CALLBACK_URL || 'http://localhost:5000/auth/google/callback',
     passReqToCallback: true
   },
   async (req, accessToken, refreshToken, profile, done) => {
     try {
       const email = profile.emails?.[0]?.value;
+      console.log('📧 Email from Google:', email);
 
       if (!email) {
+        console.log('❌ No email found in Google profile');
         return done(new Error('No email found in Google profile'), null);
       }
 
-      // ✅ Block users not in your whitelist
-      const role = allowedUsers[email];
+      const role = allowedUsers.get(email);
+      console.log('🎭 Role from allowedUsers:', role);
+
       if (!role) {
+        console.log('🚫 Unauthorized user:', email);
         return done(null, false, { message: 'Unauthorized user' });
       }
 
-      // 🔍 Look up user by email
       let user = await User.findOne({ email });
 
       if (!user) {
-        // 🆕 Create user with role from map
+        console.log('🆕 Creating new user for:', email);
         user = await User.create({
           googleId: profile.id,
           name: profile.displayName,
@@ -42,7 +44,6 @@ export default function configurePassport(app) {
           role
         });
       } else {
-        // 🔄 Update existing user if needed
         let updated = false;
 
         if (!user.googleId) {
@@ -55,26 +56,31 @@ export default function configurePassport(app) {
           updated = true;
         }
 
-        if (updated) await user.save();
+        if (updated) {
+          await user.save();
+          console.log('🔄 Updated existing user:', email);
+        }
       }
 
       return done(null, user);
-    } catch (err) {
-      console.error('Passport error:', err);
-      return done(err, null);
+    } catch (error) {
+      console.error('❌ Passport GoogleStrategy error:', error);
+      return done(error, null);
     }
   }));
 
   passport.serializeUser((user, done) => {
-    done(null, user.id); // Stores user ID in session
+    done(null, user.id);
   });
 
   passport.deserializeUser(async (id, done) => {
     try {
       const user = await User.findById(id);
       done(null, user);
-    } catch (err) {
-      done(err, null);
+    } catch (error) {
+      done(error, null);
     }
   });
-}
+};
+
+export default configurePassport;

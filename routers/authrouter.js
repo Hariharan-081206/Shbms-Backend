@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import passport from 'passport';
 import {
   googleAuth,
   googleAuthCallback,
@@ -9,7 +10,13 @@ import { getCurrentUser } from '../controllers/userControllers.js';
 
 const router = Router();
 
-router.get('/google', googleAuth);
+router.get('/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']  // <-- This is REQUIRED
+  })
+);
+
+//router.get('/google', googleAuth);
 router.get('/google/callback', googleAuthCallback);
 router.get('/logout', logout);
 router.get('/current-user', getCurrentUser);

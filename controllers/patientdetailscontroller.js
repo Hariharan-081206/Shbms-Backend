@@ -9,6 +9,7 @@ export const createPatient = async (req, res) => {
     // 🔍 Step 1: Check for available bed in the ward
     const freeBed = await Bed.findOne({ ward, isOccupied: false });
 
+    
     if (!freeBed) {
       return res.status(400).json({ error: `No available beds in ${ward}` });
     }
@@ -100,18 +101,26 @@ export const deletePatient = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 export const searchPatients = async (req, res) => {
   try {
-    const { ward, admissionDate, age, dob, admissionNumber, status} = req.query;
+    const { ward, admissionDate, age, dob, admissionNumber, status } = req.query;
     const filters = {};
 
     if (ward) filters.ward = ward;
     if (admissionDate) filters.admissionDate = new Date(admissionDate);
     if (admissionNumber) filters.admissionNumber = admissionNumber.toUpperCase();
-    if (status) filters.status = status.toLowerCase(); // 'admitted' or 'discharged'
+    if (status) filters.status = status.toLowerCase(); // e.g., 'admitted'
     if (age) filters.age = Number(age);
-    if (dob) filters.dob = new Date(dob);
+
+    // ✅ Fix: Match DOB by full day, not exact time
+    if (dob) {
+      const start = new Date(dob);
+      const end = new Date(dob);
+      end.setDate(end.getDate() + 1);
+      filters.dob = { $gte: start, $lt: end };
+    }
+
+    console.log("Search Filters:", filters); // helpful for debugging
 
     const patients = await Patient.find(filters);
     res.json(patients);
@@ -119,6 +128,7 @@ export const searchPatients = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const dischargePatient = async (req, res) => {
   try {
@@ -133,15 +143,26 @@ export const dischargePatient = async (req, res) => {
       return res.status(400).json({ message: 'Patient is already discharged' });
     }
 
+    // Mark patient as discharged
     patient.status = 'discharged';
+    patient.dischargedAt = new Date(); // optional timestamp
     await patient.save();
 
+    // Free up the assigned bed
+    if (patient.bed) {
+      const bed = await Bed.findById(patient.bed);
+      if (bed) {
+        bed.isOccupied = false;
+        bed.assignedTo = null;
+        await bed.save();
+      }
+    }
+
     res.status(200).json({
-      message: 'Patient discharged successfully',
+      message: 'Patient discharged successfully and bed freed',
       patient
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-

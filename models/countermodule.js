@@ -6,7 +6,7 @@ const counterSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-  }, // Example: "ICU2025"
+  }, 
   count: {
     type: Number,
     default: 0,

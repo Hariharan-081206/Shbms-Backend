@@ -8,8 +8,11 @@ const validWards = [
 
 const bedSchema = new mongoose.Schema({
   ward: { type: String, required: true, enum: validWards },
-  bedNumber: { type: Number, required: true },
+  bedNumber: { type: String, required: true },
   isOccupied: { type: Boolean, default: false },
+  oxygenSupport: { type: Boolean, default: false },
+  monitoringEquipment: { type: Boolean, default: false },
+  status: { type: String, enum: ['available', 'occupied', 'maintenance'], default: 'available' },
   assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', default: null }
 }, { timestamps: true });
 

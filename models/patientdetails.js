@@ -15,11 +15,10 @@ const patientSchema = new mongoose.Schema({
   dob: { type: Date, required: true },
   bloodGroup: { type: String, required: true },
   gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
-  //guardian: { type: String },
   primarymedicalcondititon: { type: String },
-  Department:{ type: String, required: true, enum: validWards },
+  department:{ type: String, required: true, enum: validWards },
   admissiontype: { type: String, enum: ['Planned', 'Transfer', 'Emergency','Outpatient'], required: true },
-  contactNumber: { type: String, required: true },
+  emergencyContact: { type: String, required: true },
   address: { type: String },
   admissionDate: { type: Date, required: true },
   status: {
@@ -30,7 +29,7 @@ const patientSchema = new mongoose.Schema({
   },
 
   reasonForAdmitting: { type: String },
-  consultingDoctor: { type: String },
+  doctor: { type: String },
   bed: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Bed',

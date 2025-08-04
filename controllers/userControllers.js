@@ -1,6 +1,7 @@
 export const getCurrentUser = (req, res) => {
-  if (req.isAuthenticated()) {
-    return res.json(req.user);
+  if (req.isAuthenticated?.()) {
+    res.json(req.user);
+  } else {
+    res.status(401).json({ message: 'Not authenticated' });
   }
-  res.status(401).json({ message: 'Not authenticated' });
 };
