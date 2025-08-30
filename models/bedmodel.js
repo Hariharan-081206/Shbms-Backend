@@ -13,7 +13,8 @@ const bedSchema = new mongoose.Schema({
   oxygenSupport: { type: Boolean, default: false },
   monitoringEquipment: { type: Boolean, default: false },
   status: { type: String, enum: ['available', 'occupied', 'maintenance'], default: 'available' },
-  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', default: null }
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'Patient', default: null },
+  
 }, { timestamps: true });
 
 bedSchema.index({ ward: 1, bedNumber: 1 }, { unique: true });
