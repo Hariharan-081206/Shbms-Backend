@@ -10,6 +10,10 @@ import patientRoutes from './routers/patientdetailsrouter.js';
 import BloodBankroutes from './routers/bloodbank.js';
 import authRoutes from './routers/authrouter.js'; 
 import configurePassport from './config/passport.js'; 
+import bloodbankExportRoutes from "./routers/bloodbankExportRoutes.js";
+import bedExportRoutes from "./routers/bedExportRoutes.js";
+import analyticsExportRoutes from "./routers/analyticsExportRoutes.js";
+
 
 import User from './models/user.js'; 
 
@@ -47,7 +51,11 @@ configurePassport(app); // must come after app.locals.models
 app.use('/api/patients', patientRoutes); 
 app.use('/api/beds',bedDashboardRouter);  
 app.use('/api/bloodbank',BloodBankroutes);    
-app.use('/auth', authRoutes);                 
+app.use('/auth', authRoutes);      
+app.use("/api/bloodbankexport", bloodbankExportRoutes);
+app.use("/api/bedsexport", bedExportRoutes);
+app.use("/api/analyticsexport", analyticsExportRoutes);
+ // Export routes        
 
 // Health check
 app.get('/', (req, res) => {
