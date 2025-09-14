@@ -77,7 +77,7 @@ npm run dev
 npm run dev
 
 
-Access at: http://localhost:3000
+Access at: http://localhost:8080
 
 ## 📂 Project Structure  
 
