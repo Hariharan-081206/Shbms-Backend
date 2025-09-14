@@ -71,10 +71,10 @@ cd shbms
 npm install
 
 # Start backend server
-npm run server
+npm run dev
 
 # Start frontend (React)
-npm run client
+npm run dev
 
 
 Access at: http://localhost:3000
